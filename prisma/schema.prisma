@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         String    @default("USER") // USER or ADMIN
+  companyId    String?
+  company      Company?  @relation(fields: [companyId], references: [id])
+  favorites    Favorite[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Company {
+  id                String         @id @default(cuid())
+  name              String
+  vatNumber         String         @unique
+  chamberOfCommerce String?
+  contactName       String
+  phone             String?
+  status            String         @default("PENDING") // PENDING, APPROVED, or REJECTED
+  users             User[]
+  prices            Price[]
+  orders            Order[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+}
+
+model Brand {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id          String     @id @default(cuid())
+  brandId     String
+  brand       Brand      @relation(fields: [brandId], references: [id])
+  width       Int        // e.g., 205
+  height      Int        // e.g., 55
+  diameter    Int        // e.g., 16
+  season      String // SUMMER, WINTER, or ALL_SEASON
+  loadIndex   Int        // e.g., 91
+  speedIndex  String     // e.g., "V"
+  sku         String     @unique
+  imageUrl    String?
+  description String?
+  inventory   Inventory?
+  prices      Price[]
+  favorites   Favorite[]
+  orderItems  OrderItem[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Inventory {
+  id           String   @id @default(cuid())
+  productId    String   @unique
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  stockQty     Int      @default(0)
+  deliveryDays Int      @default(7)
+  updatedAt    DateTime @updatedAt
+}
+
+model Price {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  companyId   String?  // null = base price, set = custom price for company
+  company     Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  priceExVat  Float
+  updatedAt   DateTime @updatedAt
+
+  @@unique([productId, companyId])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  companyId     String
+  company       Company?    @relation(fields: [companyId], references: [id])
+  status        String      @default("PENDING") // PENDING, PAID, PROCESSING, SHIPPED, COMPLETED, CANCELLED
+  paymentMethod String?     // ideal, klarna, amex, maestro
+  paymentStatus String?    // PENDING, PAID, FAILED, CANCELLED
+  paymentId     String?     // External payment provider ID
+  total         Float
+  items         OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+}
+
