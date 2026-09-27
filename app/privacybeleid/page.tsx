@@ -38,7 +38,7 @@ export default function PrivacybeleidPage() {
               <li>Bedrijfsgegevens (bedrijfsnaam, KVK-nummer, BTW-nummer)</li>
               <li>Bestel- en betalingsgegevens</li>
               <li>Technische gegevens (IP-adres, browser type, apparaat informatie)</li>
-              <li>Gebruiksgegevens (pagina's bezocht, tijdstippen van bezoek)</li>
+              <li>Gebruiksgegevens (pagina&apos;s bezocht, tijdstippen van bezoek)</li>
             </ul>
             <p className="text-gray-700">
               Wij verzamelen alleen gegevens die noodzakelijk zijn voor het verlenen van onze diensten 
