@@ -59,7 +59,7 @@ export default function AlgemeneVoorwaardenPage() {
           <Card className="mb-6">
             <h2 className="text-2xl font-semibold mb-4 text-primary">4. Prijzen en Betaling</h2>
             <p className="text-gray-700 mb-4">
-              Alle prijzen zijn in euro's en exclusief BTW. Prijzen kunnen zonder voorafgaande kennisgeving 
+              Alle prijzen zijn in euro&apos;s en exclusief BTW. Prijzen kunnen zonder voorafgaande kennisgeving 
               worden gewijzigd, maar bestellingen die al zijn bevestigd blijven tegen de oorspronkelijke prijs.
             </p>
             <p className="text-gray-700">
@@ -94,7 +94,7 @@ export default function AlgemeneVoorwaardenPage() {
           <Card className="mb-6">
             <h2 className="text-2xl font-semibold mb-4 text-primary">7. Intellectueel Eigendom</h2>
             <p className="text-gray-700">
-              Alle rechten op de inhoud van deze website, inclusief teksten, afbeeldingen en logo's, berusten 
+              Alle rechten op de inhoud van deze website, inclusief teksten, afbeeldingen en logo&apos;s, berusten 
               bij Bandendepot.com of haar licentiegevers. Gebruik zonder toestemming is niet toegestaan.
             </p>
           </Card>
