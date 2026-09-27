@@ -4,10 +4,16 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
+  // Only seed an empty database, so deploys don't recreate deleted data
+  if ((await prisma.user.count()) > 0) {
+    console.log("Database already contains users, skipping seed.");
+    return;
+  }
+
   console.log("Seeding database...");
 
   // Create admin user
-  const adminPassword = await bcrypt.hash("admin123", 10);
+  const adminPassword = await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD || "admin123", 10);
   const adminUser = await prisma.user.upsert({
     where: { email: "admin@bandendepot.com" },
     update: {},
@@ -21,7 +27,7 @@ async function main() {
   console.log("Created admin user:", adminUser.email);
 
   // Create test company with approved user
-  const testCompanyPassword = await bcrypt.hash("test123", 10);
+  const testCompanyPassword = await bcrypt.hash(process.env.SEED_TEST_PASSWORD || "test123", 10);
   const testCompany = await prisma.company.upsert({
     where: { vatNumber: "NL123456789B01" },
     update: {},
