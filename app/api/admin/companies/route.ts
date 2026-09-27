@@ -13,6 +13,9 @@ export async function GET() {
 
     const companies = await prisma.company.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        _count: { select: { users: true, orders: true } },
+      },
     });
 
     return NextResponse.json({

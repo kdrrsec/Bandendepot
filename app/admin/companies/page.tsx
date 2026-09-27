@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Search } from "lucide-react";
 import Card from "@/components/ui/Card";
 import ButtonPrimary from "@/components/ui/ButtonPrimary";
 import Badge from "@/components/ui/Badge";
@@ -13,6 +15,7 @@ interface Company {
   contactName: string;
   status: string;
   createdAt: string;
+  _count: { users: number; orders: number };
 }
 
 export default function AdminCompaniesPage() {
@@ -20,6 +23,8 @@ export default function AdminCompaniesPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"ALL" | "PENDING" | "APPROVED" | "REJECTED">("ALL");
   const [successMessage, setSuccessMessage] = useState("");
+  const [search, setSearch] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     fetchCompanies();
@@ -60,9 +65,16 @@ export default function AdminCompaniesPage() {
     }
   };
 
-  const filteredCompanies = filter === "ALL" 
-    ? companies 
-    : companies.filter((c) => c.status === filter);
+  const searchTerm = search.trim().toLowerCase();
+  const filteredCompanies = companies
+    .filter((c) => filter === "ALL" || c.status === filter)
+    .filter(
+      (c) =>
+        !searchTerm ||
+        [c.name, c.vatNumber, c.contactName].some((value) =>
+          value.toLowerCase().includes(searchTerm)
+        )
+    );
 
   const pendingCount = companies.filter((c) => c.status === "PENDING").length;
 
@@ -149,6 +161,17 @@ export default function AdminCompaniesPage() {
         </button>
       </div>
 
+      <div className="mb-4 relative max-w-md">
+        <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Zoek op naam, BTW-nummer of contactpersoon"
+          className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+        />
+      </div>
+
       <Card>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -157,6 +180,8 @@ export default function AdminCompaniesPage() {
                 <th className="text-left p-4">Bedrijfsnaam</th>
                 <th className="text-left p-4">BTW-nummer</th>
                 <th className="text-left p-4">Contactpersoon</th>
+                <th className="text-left p-4">Gebruikers</th>
+                <th className="text-left p-4">Bestellingen</th>
                 <th className="text-left p-4">Status</th>
                 <th className="text-left p-4">Datum</th>
                 <th className="text-left p-4">Acties</th>
@@ -165,8 +190,10 @@ export default function AdminCompaniesPage() {
             <tbody>
               {filteredCompanies.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-gray-500">
-                    {filter === "PENDING" 
+                  <td colSpan={8} className="p-8 text-center text-gray-500">
+                    {searchTerm
+                      ? "Geen bedrijven gevonden voor deze zoekopdracht"
+                      : filter === "PENDING" 
                       ? "Geen bedrijven in behandeling" 
                       : filter === "ALL"
                       ? "Geen bedrijven gevonden"
@@ -175,10 +202,16 @@ export default function AdminCompaniesPage() {
                 </tr>
               ) : (
                 filteredCompanies.map((company) => (
-                <tr key={company.id} className="border-b hover:bg-gray-50">
-                  <td className="p-4 font-semibold">{company.name}</td>
+                <tr
+                  key={company.id}
+                  onClick={() => router.push(`/admin/companies/${company.id}`)}
+                  className="border-b hover:bg-gray-50 cursor-pointer"
+                >
+                  <td className="p-4 font-semibold text-primary">{company.name}</td>
                   <td className="p-4">{company.vatNumber}</td>
                   <td className="p-4">{company.contactName}</td>
+                  <td className="p-4">{company._count.users}</td>
+                  <td className="p-4">{company._count.orders}</td>
                   <td className="p-4">
                     <Badge className={getStatusColor(company.status)}>
                       {getStatusLabel(company.status)}
@@ -187,8 +220,8 @@ export default function AdminCompaniesPage() {
                   <td className="p-4">
                     {new Date(company.createdAt).toLocaleDateString("nl-NL")}
                   </td>
-                  <td className="p-4">
-                    <div className="flex gap-2">
+                  <td className="p-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex gap-2 items-center">
                       {company.status === "PENDING" && (
                         <>
                           <ButtonPrimary
