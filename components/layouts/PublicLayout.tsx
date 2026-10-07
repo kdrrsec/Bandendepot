@@ -186,6 +186,22 @@ export default function PublicLayout({
           </div>
           <div className="mt-8 pt-8 border-t border-white border-opacity-20 text-center text-gray-300">
             <p>&copy; 2024 Bandendepot.com | Alle rechten voorbehouden.</p>
+            <a
+              href="https://axaweb.nl"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Powered by AxaWeb"
+              className="mt-3 inline-flex items-center gap-2 text-sm hover:text-accent"
+            >
+              Powered by
+              <img
+                src="https://axaweb.nl/apple-touch-icon.png?v=3"
+                alt="AxaWeb"
+                width={20}
+                height={20}
+                className="w-5 h-5 rounded"
+              />
+            </a>
           </div>
         </div>
       </footer>
